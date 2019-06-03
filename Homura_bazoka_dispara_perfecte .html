@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf­8" />
+<title>Kiwi.js - Hello World</title>
+</head>
+<body>
+	<script src="kiwi.js"></script>
+	<script type="text/javascript">
+		var gameOptions = {
+			renderer: Kiwi.RENDERER_CANVAS,
+			width: 850,
+			height: 425
+		}
+		var juego_homura = new Kiwi.Game('game-container', 'homuragirl', null, gameOptions);
+		var homuraState = new Kiwi.State('homuraState');
+	
+		//PRELOAD
+		homuraState.preload = function(){
+		Kiwi.State.prototype.preload.call(this);
+		this.addImage('sonidoOn','sonidoon.png');
+		this.addImage('sonidoOff','sonidooff.png');
+		this.addSpriteSheet('homuraSprite','homura.gif',132,135);
+		this.addImage('fondo','rosa.jpg');
+		this.addAudio('musica','musica_fondo.mp3');
+		this.addAudio('pasos','pasos.mp3');
+		this.addImage('bazokaBall', 'Bola.png');
+		}//FI PRELOAD
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		//CREATE
+		homuraState.create = function(){
+		Kiwi.State.prototype.create.call(this);
+		
+		this.entidad_sonidoOn = new Kiwi.GameObjects.StaticImage(this,this.textures.sonidoOn,690,10);
+		this.entidad_sonidoOff = new Kiwi.GameObjects.StaticImage(this,this.textures.sonidoOff,690,10);
+		this.entidad_fondo = new Kiwi.GameObjects.StaticImage(this,this.textures.fondo,0,0);
+		this.entidad_homura = new Kiwi.GameObjects.Sprite(this,this.textures.homuraSprite,250,250);
+		
+		this.teclaizquierda = this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.LEFT );
+		this.tecladerecha = this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.RIGHT );
+		
+		this.teclaBazoka = this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.B );
+		this.teclaAmetralladora = this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.N );
+		this.teclaSubirBazoka = this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.NUMPAD_ADD);
+		this.teclaBajarBazoka =this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.NUMPAD_SUBTRACT );
+		this.teclaFuego = this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.SPACEBAR );
+		
+		this.teclaSonidoOn = this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.O );
+		this.teclaSonidoOff = this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.P );
+		this.teclaSonidoUp = this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.K );
+		this.teclaSonidoDown = this.game.input.keyboard.addKey( Kiwi.Input.Keycodes.L );
+		
+		this.entidad_homura.animation.add( 'enpie_derecha_desarmado', [0], 0.1, false );
+		this.entidad_homura.animation.add( 'enpie_izquierda_desarmado', [16], 0.1, false );
+		this.entidad_homura.animation.add( 'enpie_derecha_bazoka', [37], 0.1, false );
+		this.entidad_homura.animation.add( 'enpie_izquierda_bazoka',  [74],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_derecha_ametralladora',  [63],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_izquierda_ametralladora',  [96],  0.1,  false  );
+
+		this.entidad_homura.animation.add( 'correr_derecha', [2, 3, 4, 5, 6, 7], 0.1, true );
+		this.entidad_homura.animation.add( 'correr_izquierda', [10, 11, 12, 13, 14, 15], 0.1, true );
+
+		this.entidad_homura.animation.add( 'correr_derecha_desarmado',  [8,9,10,11,12,13,14,15],  0.07,  true  );
+		this.entidad_homura.animation.add( 'correr_izquierda_desarmado',  [24,  25,26,27,28,29,30,31],  0.07,  true  );
+		this.entidad_homura.animation.add( 'armar_derecha_bazoka',  [32,33,34,35,36,37],  0.07,  false  );
+		this.entidad_homura.animation.add( 'armar_izquierda_bazoka',  [79,78,77,76,75,74],  0.07,  false  );
+		this.entidad_homura.animation.add( 'desarmar_derecha_bazoka',  [37,36,35,34,33,32],  0.07,  false  );
+		this.entidad_homura.animation.add( 'desarmar_izquierda_bazoka',  [74,75,76,77,78,79],  0.07,  false  );
+		this.entidad_homura.animation.add( 'armar_derecha_ametralladora',  [56,57,58,59,60,61,62,63],  0.07,  false  );
+		this.entidad_homura.animation.add( 'armar_izquierda_ametralladora',  [103,102,101,100,99,98,97,96],  0.07,  false  );
+		this.entidad_homura.animation.add( 'desarmar_derecha_ametralladora',  [63,62,61,60,59,58,57,56],  0.07,  false  );
+		this.entidad_homura.animation.add( 'desarmar_izquierda_ametralladora',  [96,97,98,99,100,101,102,103],  0.07,  false  );
+
+		this.entidad_homura.animation.add( 'enpie_derecha_bazoka_0',  [37],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_izquierda_bazoka_0',  [74],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_derecha_bazoka_1',  [36],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_izquierda_bazoka_1',  [75],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_derecha_bazoka_2',  [42],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_izquierda_bazoka_2',  [85],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_derecha_bazoka_3',  [41],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_izquierda_bazoka_3',  [86],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_derecha_bazoka_4',  [40],  0.1,  false  );
+		this.entidad_homura.animation.add( 'enpie_izquierda_bazoka_4',  [87],  0.1,  false  );
+		
+		this.armar = '_desarmado';
+		this.direccion = 'derecha';
+		this.posicion = 'enpie_';
+		this.angulo_bazoka = 0;
+		
+		this.textoVolumen = new Kiwi.GameObjects.TextField( this, "Volumen: "+this.game.audio.volume, 600, 27, 000000,14, 'normal', 'immpact');
+		
+		this.addChild(this.entidad_fondo);
+		this.addChild(this.entidad_homura);
+		this.addChild(this.entidad_sonidoOn);
+		this.addChild(this.entidad_sonidoOff);
+		this.addChild(this.textoVolumen);
+				
+		this.entidad_homura.animation.play( 'enpie_derecha_desarmado' );
+		
+		this.musica = new Kiwi.Sound.Audio(this.game,'musica',0.3,true);
+		this.pasos = new Kiwi.Sound.Audio(this.game,'pasos',0.3,true);
+		
+		this.entidad_sonidoOn.visible = false;
+		this.entidad_sonidoOff.visible = false;
+		this.textoVolumen.visible = false;
+		
+		this.musica.play();
+		this.game.audio.volume = 1;
+
+		this.temporizador_texto = this.game.time.clock.createTimer('temporizador_texto', 1, 3, false);
+		this.temporizador_texto.createTimerEvent( Kiwi.Time.TimerEvent.TIMER_START, this.onTempoTextoStart, this);
+		this.temporizador_texto.createTimerEvent( Kiwi.Time.TimerEvent.TIMER_STOP, this.onTempoTextoStop, this);
+
+		this.temporizador_fuego = this.game.time.clock.createTimer('temporizador_fuego', 1,  1,  false);
+		this.temporizador_fuego.createTimerEvent( Kiwi.Time.TimerEvent.TIMER_START, this.onTempoFuegoStart, this);
+		this.temporizador_fuego.createTimerEvent( Kiwi.Time.TimerEvent.TIMER_STOP, this.onTempoFuegoStop, this);
+
+		this.bazokaBallGroup = new Kiwi.Group(this);
+		this.addChild(this.bazokaBallGroup);
+		this.bazokaActivado = true;
+		}  //Fi create
+
+		homuraState.onTempoFuegoStart = function(){
+			this.bazokaActivado = false;
+		}
+
+		homuraState.onTempoFuegoStop = function(){
+			this.bazokaActivado = true;
+		}
+
+
+		var bazokaBall = function(state, x, y, direccion, angulo){
+			Kiwi.GameObjects.Sprite.call(this, state, state.textures['bazokaBall'], x, y, false);
+			this.speed = 20;
+			bazokaBall.prototype.update = function(){
+				if (direccion == 'izquierda')
+					this.x = this.x - this.speed;
+				else
+					this.x = this.x + this.speed;
+				this.y = this.y + angulo;
+				Kiwi.GameObjects.Sprite.prototype.update.call(this);
+				if (this.x > juego_homura.stage.width || this.x < 0 || this.y > juego_homura.stage.height || this.y < 0)
+					this.destroy();
+			}
+		}
+
+		Kiwi.extend(bazokaBall, Kiwi.GameObjects.Sprite);
+
+		homuraState.createBazokaBullet = function(posx, posy, direccion, angulo){
+			this.balaBazoka = new bazokaBall (this, posx, posy, direccion, angulo);
+			this.bazokaBallGroup.addChild(this.balaBazoka);
+		}
+
+
+
+		homuraState.checkFireBazoka = function(){
+			if (this.bazokaActivado = true){
+			var pendiente_disparo = 0;
+			var incrementox = 0;
+			var incrementoy = 0;
+			if (this.teclaFuego.justReleased()){
+				this.teclaFuego.reset()
+				switch (this.angulo_bazoka){
+					case 0:
+						if (this.direccion = 'derecha')
+							incrementox = 120;
+						else 
+							incrementox = -20;
+							incrementoy = 40;
+							pendiente_disparo =0;
+						break;
+					case 1:
+						if (this.direccion = 'derecha')
+							incrementox = 115;
+						else
+							incrementox = -15;
+							incrementoy =30;
+							pendiente_disparo =-0.7;
+						break;
+					case 2:
+						if (this.direccion = 'derecha')
+							incrementox = 110;
+						else
+							incrementox = -10;
+							incrementoy = 20;
+							pendiente_disparo =-6;
+						break;
+					case 3:
+						if (this.direccion = 'derecha')
+							incrementox = 100;
+						else 
+							incrementox = 0;
+							incrementoy = 10;
+							pendiente_disparo =-10;
+						break;
+					case 4:
+						if (this.direccion = 'derecha')
+							incrementox = 85;
+						else
+							incrementox = 15;
+							incrementoy = 10;
+							pendiente_disparo =-17;
+						break;
+					case 5:
+						if (this.direccion = 'derecha')
+							incrementox = 80;
+						else 
+							incrementox = 20;
+							incrementoy = 0;
+							pendiente_disparo =-19;
+						break;
+				}
+				this.createBazokaBullet(this.entidad_homura.transform.x + incrementox, this.entidad_homura.transform.y + incrementoy, this.direccion, pendiente_disparo);
+			}
+			}
+		}
+
+		
+		homuraState.onTempoTextoStart = function() {
+			this.textoVolumen.visible = true;
+			if ( this.musica.isPlaying ) {
+				this.entidad_sonidoOn.visible = true;
+				this.entidad_sonidoOff.visible = false;
+			}
+			else {
+				this.entidad_sonidoOn.visible = false;
+				this.entidad_sonidoOff.visible = true;
+			}	
+		}
+
+		homuraState.onTempoTextoStop = function() {
+			this.textoVolumen.visible = false;
+			this.entidad_sonidoOn.visible = false;
+			this.entidad_sonidoOff.visible = false;
+		}
+
+		homuraState.cambiando_estado_arma = function(){
+			if ((this.posicion=='armar_'&&this.entidad_homura.animation.currentAnimation.isPlaying)) return true;
+				else 
+					if ((this.posicion=='desarmar_'&&this.entidad_homura.animation.currentAnimation.isPlaying)) return true;
+					else return  false;		
+		}
+
+		
+		
+		//Mètode UPDATE
+		homuraState.update = function(){
+			Kiwi.State.prototype.update.call( this );
+
+			if (this.armar=='_bazoka'){
+				this.checkFireBazoka();
+				this.temporizador_fuego.start ();
+			}
+
+			//SO
+			if (this.teclaSonidoOn.isDown) {
+				this.musica.play();
+				this.temporizador_texto.start ();
+			}
+			else if ( this.teclaSonidoOff.isDown ){
+				this.musica.pause();
+				this.temporizador_texto.start ();
+			}
+			else if ( this.teclaSonidoUp.isDown ){
+				if(this.game.audio.volume >= 0){
+            	this.game.audio.volume += 0.1;
+            	this.temporizador_texto.start ();
+            	this.textoVolumen.text = "Volumen: "+Math.round(this.game.audio.volume*10);
+            }
+			}
+			else if ( this.teclaSonidoDown.isDown ){
+            if(this.game.audio.volume <= 1){
+            	this.game.audio.volume -= 0.1;
+            	this.temporizador_texto.start ();
+            	this.textoVolumen.text = "Volumen: "+Math.round(this.game.audio.volume*10);
+            }
+			}	
+			else{
+				if (this.teclaizquierda.isDown){
+					if (!this.cambiando_estado_arma())
+						if(this.armar=='_desarmado'){
+							this.direccion = 'izquierda';
+							this.posicion =  'correr_';
+							if (this.entidad_homura.x > 6) this.entidad_homura.x-=6;
+							if (this.entidad_homura.animation.currentAnimation.name !=  'correr_izquierda_desarmado'){
+								this.pasos.play();
+								this.entidad_homura.animation.play(this.posicion+this.direccion+this.armar);
+							}
+						}
+					
+					else {  //si  estoy  armado, cambiar  de  sentido
+						this.direccion = 'izquierda';
+						this.entidad_homura.animation.play( this.posicion+this.direccion+this.armar );
+					}                
+				}//fin  tecla  izquierda  is  down
+						
+         	else if (this.tecladerecha.isDown){
+					if (!this.cambiando_estado_arma())
+						if (this.armar == '_desarmado'){
+         		   	this.direccion = 'derecha';
+         		   	this.posicion = 'correr_';
+							if ( this.entidad_homura.x < 1500 ) this.entidad_homura.x+=6;
+							if (this.entidad_homura.animation.currentAnimation.name != 'correr_derecha_desarmado'){
+								this.pasos.play()
+								this.entidad_homura.animation.play(this.posicion+this.direccion+this.armar);
+							}
+						}
+					else {
+						this.direccion = 'derecha';
+						this.entidad_homura.animation.play(this.posicion+this.direccion+this.armar );
+					}
+				}//fin  tecla  derecha  is  down
+						
+						else if ( this.teclaAmetralladora.isDown ){
+							if (this.posicion=='enpie_' && this.armar!='_bazoka'){
+								if (this.armar=='_desarmado'){
+									this.posicion = 'armar_';  
+									this.armar='_ametralladora'; 
+								}
+							else  if (this.armar=='_ametralladora'){ 
+								this.posicion = 'desarmar_'; 
+								this.armar='_ametralladora';
+							}
+								if (this.entidad_homura.animation.currentAnimation.name != this.posicion+this.direccion+this.armar){
+									this.entidad_homura.animation.play( this.posicion+this.direccion+this.armar );
+								}
+							}
+						}//fin tecla ametralladora
+						
+						else if( this.teclaBazoka.isDown ){
+						  	if (this.posicion=='enpie_' && this.armar!='_ametralladora'){
+						  		if (this.armar=='_desarmado'){
+						  			this.posicion = 'armar_';
+									this.armar='_bazoka';
+								}
+						  	else if (this.armar=='_bazoka'){
+						  		this.posicion = 'desarmar_';
+						  		this.armar='_bazoka';
+							}
+					  		if (this.entidad_homura.animation.currentAnimation.name != this.posicion+this.direccion+this.armar){
+					  			this.entidad_homura.animation.play( this.posicion+this.direccion+this.armar );
+					  		}
+					  		}
+					  	}//fin tecla bazoka
+
+					  	else if ( this.teclaSubirBazoka.isDown){
+					  		this.teclaSubirBazoka.reset()
+					  		if (!this.cambiando_estado_arma())
+					  		if (this.posicion=='enpie_'&&this.armar=='_bazoka'){
+					  			if (this.angulo_bazoka < 4) this.angulo_bazoka++;
+					  	this.entidad_homura.animation.play(this.posicion+this.direccion+this.armar+'_'+this.angulo_bazoka.toString());
+					  		}
+					  	} //Fi tecla subir bazoka
+
+					  	else if ( this.teclaBajarBazoka.justReleased()){
+					  		this.teclaBajarBazoka.reset()
+					  		if (!this.cambiando_estado_arma())
+					  			if (this.posicion=='enpie_'&&this.armar=='_bazoka'){
+					  				if (this.angulo_bazoka>0) this.angulo_bazoka--;
+					  				this.entidad_homura.animation.play(this.posicion+this.direccion+this.armar+'_'+this.angulo_bazoka.toString());
+					  			}
+					  	}
+
+            		   else 
+            		   	if (!this.cambiando_estado_arma()){
+            		   		if (this.posicion == 'desarmar_') this.armar='_desarmado';
+            		   			this.posicion = 'enpie_';
+            		   		if(this.pasos.isPlaying) this.pasos.pause();
+            		   		if (this.armar=='_bazoka')
+            		   		this.entidad_homura.animation.play(this.posicion+this.direccion+this.armar+'_'+this.angulo_bazoka.toString());
+            		   	else this.entidad_homura.animation.play(this.posicion+this.direccion+this.armar);   
+            		   	}
+            				 
+            			
+            	}
+            	console.log(this.posicion+this.direccion+this.armar);
+		}//Fi UPDATE
+	
+		juego_homura.states.addState( homuraState );
+		juego_homura.states.switchState('homuraState');
+	</script>
+</body>
+</html>
